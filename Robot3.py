@@ -73,58 +73,63 @@ rospy.loginfo("Starting Iterations:")
 global i1
 i1 = 0
 goal1 = Point()
+while status<3:
+    r.sleep()
+status=0
+r.sleep()
+strMsg=x+"@"+y
+list1.append(strMsg)
+rospy.loginfo(strMsg)
+pubPos.publish(strMsg)
+r.sleep()
+pubStat.publish("1")
+while status<3:
+    r.sleep()
+status=0
+goal1 = Point()
+rospy.loginfo("Starting Iterations:")
+global i1
+i1=0
+goal1 = Point()
 while 1:
-    s1 = len(list2)
-    if i1 <= s1 - 1:
-        localstr1 = list2[i1]
-        a1, b1 = localstr1.split("@")
-        global x1
-        global y1
-        x1 = float(a1)
-        y1 = float(b1)
+    localstr = list1[i1]
+    a, b = localstr.split("@")
+    localstr1 = list2[i1]
+    a1,b1 = localstr1.split("@")
+    global x1
+    global y1
+    x1=float(a1)
+    y1=float(b1)
+    x=float(a)
+    y=float(b)
+    rospy.loginfo("Points of Robot 2")
+    rospy.loginfo(x3)
+    rospy.loginfo(y3)
+    t1=round(x1,2)
+    t2 = round(y1, 2)
+    r1=round(x,2)
+    r2 = round(y, 2)
+    if t1-r1==0 and t2-r2==0 :
+        break
     else:
-        break
-    rospy.loginfo("Points of Robot 1")
-    rospy.loginfo(x1)
-    rospy.loginfo(y1)
-    rospy.loginfo("Goal Position:")
-    goal1.x = 0.6 * x1 + 0.4 * x
-    goal1.y = 0.6 * y1 + 0.4 * y
-    rospy.loginfo(goal1.x)
-    rospy.loginfo(goal1.y)
-    inc_x = goal1.x - x
-    inc_y = goal1.y - y
-    angle_to_goal = atan2(inc_y, inc_x)
-    while abs(goal1.x - x) > 0.2 or abs(goal1.y - y) > 0.2:
-        if abs(angle_to_goal - theta) > 0.15:
-            speed.linear.x = 0.0
-            speed.angular.z = 0.5
-        else:
-            speed.linear.x = 0.5
-            speed.angular.z = 0.0
-        pub.publish(speed)
+        goal1.x = 0.8*x+0.2*x1
+        goal1.y = 0.8*y+0.2*y1
+        rospy.loginfo("Finished Iteration:")
+        rospy.loginfo(i1)
+        i1=i1+1
+        rospy.loginfo("Waiting for next iteration value:")
+        px=str(goal1.x)
+        py=str(goal1.y)
+        strMsg=px+"@"+py
+        list1.append(strMsg)
+        rospy.loginfo("strMsg")
+        pubPos.publish(strMsg)
         r.sleep()
-    speed.linear.x = 0.0
-    speed.angular.z = 0.0
-    pub.publish(speed)
-    rospy.loginfo("Finished Iteration")
-    i1 = i1 + 1
-    px = str(round(x, 2))
-    py = str(round(y, 2))
-    strMsg = px + "@" + py
-    rospy.loginfo(len(list1))
-    rospy.loginfo(i1)
-    pubPos.publish(strMsg)
-    rospy.loginfo("Published Position")
-    r.sleep()
-    pubStat.publish("1")
-    rospy.loginfo("Published Status")
-    r.sleep()
-    rospy.loginfo("Waiting for Status:")
-    while status < 3:
-        pub.publish(speed)
-    if status==4:
-        break
-        rospy.loginfo("Stoping the movement")
-    rospy.loginfo("Got Next iteration points")
-    status = 0
+        pubStat.publish("1")
+        r.sleep()
+        rospy.loginfo("Waiting for Status")
+        while  status < 3:
+            pub.publish(speed)
+            r.sleep()
+        rospy.loginfo("Got Next iteration points")
+        status=0
